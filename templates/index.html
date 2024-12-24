@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能文件翻译服务</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes loading {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+            <div class="container mx-auto px-4 py-16">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">智能文件翻译服务</h1>
+                    <p class="text-xl md:text-2xl text-blue-100 mb-8">快速、准确的多语言文档翻译解决方案</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container mx-auto px-4 py-8">
+            <!-- Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-blue-600 text-3xl mb-4">📄</div>
+                    <h3 class="text-xl font-semibold mb-2">多格式支持</h3>
+                    <p class="text-gray-600">支持 PDF、HTML、Markdown、EPUB 等多种文档格式</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-blue-600 text-3xl mb-4">🚀</div>
+                    <h3 class="text-xl font-semibold mb-2">快速处理</h3>
+                    <p class="text-gray-600">采用先进的AI模型，快速完成翻译任务</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-blue-600 text-3xl mb-4">🎯</div>
+                    <h3 class="text-xl font-semibold mb-2">精准翻译</h3>
+                    <p class="text-gray-600">保持原文格式，确保翻译准确性</p>
+                </div>
+            </div>
+
+            <!-- Upload Form -->
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <form id="uploadForm" class="space-y-6" enctype="multipart/form-data">
+                        <div>
+                            <label for="file" class="block text-sm font-medium text-gray-700 mb-2">
+                                选择文件 (支持 PDF, HTML, Markdown, EPUB)
+                            </label>
+                            <input type="file" id="file" name="file" 
+                                accept=".pdf,.html,.md,.epub" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="output_format" class="block text-sm font-medium text-gray-700 mb-2">输出格式</label>
+                                <select id="output_format" name="output_format" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="same">保持原格式</option>
+                                    <option value="markdown">转换为Markdown</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">处理选项</label>
+                                <div class="flex items-center space-x-4">
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" id="need_translate" name="need_translate" 
+                                            class="form-checkbox h-4 w-4 text-blue-600" checked
+                                            onchange="toggleTranslateOptions()">
+                                        <span class="ml-2">需要翻译</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="translate_options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="source_lang" class="block text-sm font-medium text-gray-700 mb-2">源语言</label>
+                                <select id="source_lang" name="source_lang"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="en">英语</option>
+                                    <option value="zh">简体中文</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="target_lang" class="block text-sm font-medium text-gray-700 mb-2">目标语言</label>
+                                <select id="target_lang" name="target_lang"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="zh">简体中文</option>
+                                    <option value="en">英语</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="model" class="block text-sm font-medium text-gray-700 mb-2">选择模型</label>
+                                <select id="model" name="model"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    {% if models %}
+                                        {% for model in models %}
+                                        <option value="{{ model }}">{{ model }}</option>
+                                        {% endfor %}
+                                    {% else %}
+                                        <option value="">未找到可用模型</option>
+                                    {% endif %}
+                                </select>
+                                <div class="mt-2 text-sm text-gray-500">
+                                    可用模型: {{ models|length }} 个
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            function toggleTranslateOptions() {
+                                const needTranslate = document.getElementById('need_translate').checked;
+                                const translateOptions = document.getElementById('translate_options');
+                                const sourceLang = document.getElementById('source_lang');
+                                const targetLang = document.getElementById('target_lang');
+                                const model = document.getElementById('model');
+                                
+                                translateOptions.style.display = needTranslate ? 'grid' : 'none';
+                                sourceLang.required = needTranslate;
+                                targetLang.required = needTranslate;
+                                model.required = needTranslate;
+                            }
+
+                            // 页面加载时初始化
+                            document.addEventListener('DOMContentLoaded', function() {
+                                toggleTranslateOptions();
+                            });
+                        </script>
+
+                        <button type="submit" 
+                            class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                            开始处理
+                        </button>
+                    </form>
+
+                    <div id="loading" class="hidden mt-6 text-center text-gray-600">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
+                        <p class="mt-2">正在处理中...</p>
+                    </div>
+
+                    <div id="status" class="hidden mt-6 p-4 rounded-md"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('file');
+            const needTranslate = document.getElementById('need_translate').checked;
+            const outputFormat = document.getElementById('output_format').value;
+            
+            // 验证文件
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('请选择要处理的文件');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('output_format', outputFormat);
+            formData.append('need_translate', String(needTranslate));  // 转换为字符串
+            
+            // 添加翻译相关的参数，如果不需要翻译则使用空字符串
+            const sourceLang = needTranslate ? document.getElementById('source_lang').value : '';
+            const targetLang = needTranslate ? document.getElementById('target_lang').value : '';
+            const model = needTranslate ? document.getElementById('model').value : '';
+            
+            formData.append('source_lang', sourceLang);
+            formData.append('target_lang', targetLang);
+            formData.append('model', model);
+            
+            const loading = document.getElementById('loading');
+            const status = document.getElementById('status');
+            
+            loading.classList.remove('hidden');
+            status.classList.add('hidden');
+            
+            try {
+                const response = await fetch('/translate-file', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Response error:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        error: errorData
+                    });
+                    throw new Error(errorData.detail || '处理失败');
+                }
+                
+                const result = await response.json();
+                console.log('Success response:', result);
+                
+                status.textContent = '处理成功！正在准备下载...';
+                status.classList.remove('hidden');
+                status.className = 'mt-6 p-4 rounded-md bg-green-100 text-green-800';
+                
+                // 创建下载链接
+                const downloadUrl = `/download/${result.filename}`;
+                const downloadLink = document.createElement('a');
+                downloadLink.href = downloadUrl;
+                downloadLink.className = 'block mt-4 text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700';
+                downloadLink.textContent = '下载处理后的文件';
+                status.appendChild(downloadLink);
+            } catch (error) {
+                console.error('处理错误:', error);
+                status.textContent = error.message || '上传失败，请重试';
+                status.classList.remove('hidden');
+                status.className = 'mt-6 p-4 rounded-md bg-red-100 text-red-800';
+            } finally {
+                loading.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
